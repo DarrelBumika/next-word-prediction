@@ -6,8 +6,8 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 app = Flask(__name__)
 
 # Load model and tokenizer
-model = load_model('..\\MachineLearning\\model\\model.h5')
-with open('..\\MachineLearning\\model\\tokenizer.pkl', 'rb') as f:
+model = load_model('.\\model\\model.h5')
+with open('.\\model\\tokenizer.pkl', 'rb') as f:
     tokenizer = pickle.load(f)
 
 @app.route('/')
