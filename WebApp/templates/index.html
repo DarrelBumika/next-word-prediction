@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Word Prediction</title>
+    <link href="{{url_for('static', filename='css/output.css')}}" rel="stylesheet">
+    <script src="{{url_for('static', filename='js/script.js')}}"></script>
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col">
+    <div class="flex flex-col grow justify-center items-center">
+        <h1 class="text-center mb-4">Next Word Prediction</h1>
+        <div class="h-80 flex flex-col justify-center items-center">
+            <textarea type="text" oninput="auto_grow(this)" class="text-7xl focus-visible:outline-none w-auto focus:placeholder:invisible text-center resize-none overflow-hidden" id="inputText" autocomplete="off" placeholder="Type Something..."></textarea>
+        </div>
+        <div class="text-center h-4" id="inlineSuggestion"></div>
+    </div>
+    <div class="flex flex-col justify-center items-center py-5">
+        <div>by Ashilpa Darrel Bumika</div>
+        <div class="flex gap-2">
+            <a>Source Code</a>
+            -
+            <a class="hover:underline" href="https://www.kaggle.com/datasets/muhammadbilalhaneef/sherlock-holmes-next-word-prediction-corpus" target="_blank">Dataset</a>
+        </div>
+        <div class="flex gap-2">
+            <a href="https://www.linkedin.com/in/ashilpadarrel/" target="_blank">
+                <img src="{{url_for('static', filename='img/linkedin.png')}}" class="h-8" alt="LinkedIn">
+            </a>
+            <a href="https://github.com/DarrelBumika" target="_blank">
+                <img src="{{url_for('static', filename='img/github.png')}}" class="h-8" alt="GitHub">
+            </a>
+            <a href="https://ashilpadarrelbumika.vercel.app" target="_blank">
+                <img src="{{url_for('static', filename='img/d_icon.png')}}" class="h-8 object-cover" alt="Portfolio">
+            </a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const input = $('#inputText');
+            const suggestion = $('#inlineSuggestion');
+            
+            input.on('input', function() {
+                const text = $(this).val();
+                if(text.length > 0) {
+                    $.ajax({
+                        url: '/predict',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({text: text}),
+                        success: function(response) {
+                            if(response.predictions.length > 0) {
+                                const currentText = input.val();
+                                const topPrediction = response.predictions[0].word;
+                                suggestion.text(topPrediction);
+                            } else {
+                                suggestion.text('');
+                            }
+                        }
+                    });
+                } else {
+                    suggestion.text('');
+                }
+            });
+            
+            input.on('keydown', function(e) {
+                // Accept suggestion on Tab key
+                if(e.key === 'Tab' && suggestion.text().length > 0) {
+                    e.preventDefault();
+                    input.val($(this).val() + suggestion.text());
+                    suggestion.text('');
+                }
+                // Clear suggestion on Escape key
+                if(e.key === 'Escape') {
+                    suggestion.text('');
+                }
+            });
+            
+            // Clear suggestion when input loses focus
+            input.on('blur', function() {
+                setTimeout(() => suggestion.text(''), 200);
+            });
+        });
+    </script>
+</body>
+</html>
